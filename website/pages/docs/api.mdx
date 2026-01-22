@@ -24,13 +24,13 @@ An object with the following properties:
 | phi | The [φ angle](https://en.wikipedia.org/wiki/Spherical_coordinate_system), 0 ≤ phi ≤ 2π | Required |
 | theta | The [θ angle](https://en.wikipedia.org/wiki/Spherical_coordinate_system), -π ≤ theta ≤ π | Required |
 | mapSamples | Number of dots displayed, 0 ≤ mapSamples ≤ 100000 | Required |
+| dotSize | Size of each dot, defaults to 0.008 |  |
 | baseColor | [r, g, b] of the ocean/background color, 0 ≤ r, g, b ≤ 1 | Required |
 | landColor | [r, g, b] of the land dots color, 0 ≤ r, g, b ≤ 1 | Required |
 | markerColor | [r, g, b] of the markers' color, 0 ≤ r, g, b ≤ 1 | |
 | scale | Scales the globe, 0 ≤ scale |  |
 | offset | [offsetX, offsetY], offset of the globe in pixel |  |
 | markers | An array of markers displayed | |
-| opacity | The transparency of the globe texture | |
 | onRender | A callback function called when a new frame is rendered | Required |
 
 You can check how some of them actually look like in the [Playground](https://cobe-playground.vercel.app).

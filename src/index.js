@@ -3,6 +3,7 @@ import Phenomenon from "phenomenon";
 const OPT_PHI = "phi";
 const OPT_THETA = "theta";
 const OPT_DOTS = "mapSamples";
+const OPT_DOT_SIZE = "dotSize";
 const OPT_BASE_COLOR = "baseColor";
 const OPT_LAND_COLOR = "landColor";
 const OPT_MARKER_COLOR = "markerColor";
@@ -10,18 +11,17 @@ const OPT_MARKERS = "markers";
 const OPT_DPR = "devicePixelRatio";
 const OPT_OFFSET = "offset";
 const OPT_SCALE = "scale";
-const OPT_OPACITY = "opacity";
 
 const OPT_MAPPING = {
     [OPT_PHI]: GLSLX_NAME_PHI,
     [OPT_THETA]: GLSLX_NAME_THETA,
     [OPT_DOTS]: GLSLX_NAME_DOTS,
+    [OPT_DOT_SIZE]: GLSLX_NAME_DOT_SIZE,
     [OPT_BASE_COLOR]: GLSLX_NAME_BASE_COLOR,
     [OPT_LAND_COLOR]: GLSLX_NAME_LAND_COLOR,
     [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
     [OPT_OFFSET]: GLSLX_NAME_OFFSET,
     [OPT_SCALE]: GLSLX_NAME_SCALE,
-    [OPT_OPACITY]: GLSLX_NAME_OPACITY,
 };
 
 const { PI, sin, cos, sqrt, atan2, floor, max, pow, log2 } = Math;
@@ -160,6 +160,7 @@ export default (canvas, opts) => {
             [GLSLX_NAME_PHI]: createUniform("float", OPT_PHI),
             [GLSLX_NAME_THETA]: createUniform("float", OPT_THETA),
             [GLSLX_NAME_DOTS]: createUniform("float", OPT_DOTS),
+            [GLSLX_NAME_DOT_SIZE]: createUniform("float", OPT_DOT_SIZE, 0.008),
             [GLSLX_NAME_BASE_COLOR]: createUniform("vec3", OPT_BASE_COLOR),
             [GLSLX_NAME_LAND_COLOR]: createUniform("vec3", OPT_LAND_COLOR),
             [GLSLX_NAME_MARKER_COLOR]: createUniform("vec3", OPT_MARKER_COLOR),
@@ -173,7 +174,6 @@ export default (canvas, opts) => {
             },
             [GLSLX_NAME_OFFSET]: createUniform("vec2", OPT_OFFSET, [0, 0]),
             [GLSLX_NAME_SCALE]: createUniform("float", OPT_SCALE, 1),
-            [GLSLX_NAME_OPACITY]: createUniform("float", OPT_OPACITY, 1),
         },
         mode: 4,
         geometry: {

@@ -13,12 +13,12 @@ export interface COBEOptions {
   phi: number;
   theta: number;
   mapSamples: number;
+  dotSize?: number;
   baseColor: [number, number, number];
   landColor: [number, number, number];
   markerColor: [number, number, number];
   markers: Marker[];
   devicePixelRatio: number;
-  opacity?: number;
   offset?: [number, number];
   scale?: number;
   context?: WebGLContextAttributes;

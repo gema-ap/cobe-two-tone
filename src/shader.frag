@@ -13,7 +13,7 @@ uniform vec3 landColor;
 uniform vec3 markerColor;
 uniform vec4 markers[64 * 2]; // Now each marker takes 2 vec4 entries: [position+size, color]
 uniform float markersNum;
-uniform float opacity;
+uniform float dotSize;
 
 uniform sampler2D uTexture;
 
@@ -153,7 +153,7 @@ void main() {
     if (gP.z < 0.) gTheta = -gTheta;
 
     float landMask = texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x;
-    float v = smoothstep(.008, .0, dis);
+    float v = step(dis, dotSize);
 
     // Flat coloring: land dots show landColor, everything else shows baseColor
     float isLandDot = landMask * v;
@@ -170,17 +170,14 @@ void main() {
 
       // c is already the nearest Fibonacci lattice point, so use it directly
       if (dis < size) {
-        float halfSize = size * .5;
-        float hr = smoothstep(halfSize, 0., dis);
-        // Flat marker coloring
-        if (markerColorData.w > 0.5) {
-          layer.xyz = mix(layer.xyz, markerColorData.xyz, hr);
-        } else {
-          layer.xyz = mix(layer.xyz, markerColor, hr);
-        }
+        float innerSize = size * 0.8;
+        float isInner = step(dis, innerSize);
+        // Solid marker with baseColor outline
+        vec3 fillColor = markerColorData.w > 0.5 ? markerColorData.xyz : markerColor;
+        layer.xyz = mix(baseColor, fillColor, isInner);
       }
     }
-    color += layer * (1. + opacity) * .5;
+    color += layer;
   }
 
   gl_FragColor = color;
