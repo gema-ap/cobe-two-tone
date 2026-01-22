@@ -21,6 +21,11 @@ export interface COBEOptions {
   devicePixelRatio: number;
   offset?: [number, number];
   scale?: number;
+  range?: number;
+  rangeColor?: [number, number, number];
+  rangeOpacity?: number;
+  selectedMarker?: number | null;
+  onMarkerSelect?: (index: number | null, marker: Marker | null) => void;
   context?: WebGLContextAttributes;
 }
 

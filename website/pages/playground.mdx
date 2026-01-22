@@ -11,6 +11,9 @@ export function Page() {
   const canvasRef = useRef()
   const pause = useRef(false)
   const paramsRef = useRef({})
+  const rotationRef = useRef(0)
+  const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, startPhi: 0, startTheta: 0, wasDrag: false })
+  const manualRotationRef = useRef({ phi: 0, theta: 0 })
   paramsRef.current = useControls({
     phi: { value: 0, min: 0, max: Math.PI * 2 },
     theta: { value: 0, min: -Math.PI / 2, max: Math.PI / 2 },
@@ -20,6 +23,9 @@ export function Page() {
     landColor: { r: 255, g: 255, b: 255 },
     markerColor: { r: 255, g: 255, b: 255 },
     markerSize: { value: 0.05, min: 0, max: 0.1 },
+    range: { value: 2000, min: 0, max: 20000 },
+    rangeColor: { r: 255, g: 128, b: 0 },
+    rangeOpacity: { value: 0.5, min: 0, max: 1 },
     scale: { value: 1, min: 0, max: 4 },
     offsetX: { value: 0, min: -1, max: 1 },
     offsetY: { value: 0, min: -1, max: 1 },
@@ -33,9 +39,9 @@ export function Page() {
     if (!canvasRef.current) return
     const canvas = canvasRef.current
     const size = Math.min(window.innerHeight, window.innerWidth, 800)
-    let r = 0
     canvas.width = size * 2
     canvas.height = size * 2
+
     const markerLocations = [
       // San Francisco - default color
       { location: [37.7595, -122.4367] },
@@ -56,7 +62,7 @@ export function Page() {
       // Brazil - pink
       { location: [-9.746956, -44.261249], color: [1, 0.4, 0.7] },
     ]
-    const p = create(canvas, {
+    const globe = create(canvas, {
       devicePixelRatio: 2,
       width: size * 2,
       height: size * 2,
@@ -66,11 +72,13 @@ export function Page() {
       baseColor: [0.3, 0.3, 0.3],
       landColor: [1, 1, 1],
       markerColor: [1, 0.5, 1],
+      range: paramsRef.current.range,
+      rangeColor: [1, 0.5, 0],
       markers: markerLocations.map((marker) => ({ ...marker, size: paramsRef.current.markerSize })),
       onRender: (state) => {
-        state.phi = paramsRef.current.phi + r
-        if (!pause.current) r += 0.003
-        state.theta = paramsRef.current.theta
+        state.phi = paramsRef.current.phi + rotationRef.current + manualRotationRef.current.phi
+        if (!pause.current && !dragRef.current.isDragging) rotationRef.current += 0.003
+        state.theta = paramsRef.current.theta + manualRotationRef.current.theta
         state.mapSamples = paramsRef.current.mapSamples
         state.dotSize = paramsRef.current.dotSize
         state.baseColor = [
@@ -94,10 +102,64 @@ export function Page() {
           paramsRef.current.offsetX * size * 4,
           paramsRef.current.offsetY * size * 4,
         ]
+        state.range = paramsRef.current.range
+        state.rangeColor = [
+          paramsRef.current.rangeColor.r / 255,
+          paramsRef.current.rangeColor.g / 255,
+          paramsRef.current.rangeColor.b / 255,
+        ]
+        state.rangeOpacity = paramsRef.current.rangeOpacity
       },
     })
+
+    // Drag handlers for manual rotation
+    const handleMouseDown = (e) => {
+      dragRef.current = {
+        isDragging: true,
+        startX: e.clientX,
+        startY: e.clientY,
+        startPhi: manualRotationRef.current.phi,
+        startTheta: manualRotationRef.current.theta,
+        wasDrag: false
+      }
+    }
+
+    const handleMouseMove = (e) => {
+      if (!dragRef.current.isDragging) return
+      const dx = e.clientX - dragRef.current.startX
+      const dy = e.clientY - dragRef.current.startY
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        dragRef.current.wasDrag = true
+      }
+      manualRotationRef.current.phi = dragRef.current.startPhi + dx * 0.005
+      manualRotationRef.current.theta = Math.max(-Math.PI / 2, Math.min(Math.PI / 2,
+        dragRef.current.startTheta + dy * 0.005
+      ))
+    }
+
+    const handleMouseUp = () => {
+      dragRef.current.isDragging = false
+    }
+
+    // Prevent click from firing on drag
+    const handleClick = (e) => {
+      if (dragRef.current.wasDrag) {
+        e.stopPropagation()
+        dragRef.current.wasDrag = false
+      }
+    }
+
+    canvas.addEventListener('mousedown', handleMouseDown)
+    canvas.addEventListener('click', handleClick, true) // Capture phase to intercept before core handler
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
     return () => {
-      p.destroy()
+      canvas.removeEventListener('mousedown', handleMouseDown)
+      canvas.removeEventListener('click', handleClick, true)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      globe.destroy()
     }
   }, [])
   return (
@@ -111,7 +173,8 @@ export function Page() {
           width: 'min(100vmin, 800px)',
           height: 'min(100vmin, 800px)',
           margin: '20px auto',
-          backgroundColor
+          backgroundColor,
+          cursor: 'grab'
         }}
       />
     </>

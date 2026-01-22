@@ -31,6 +31,11 @@ An object with the following properties:
 | scale | Scales the globe, 0 ≤ scale |  |
 | offset | [offsetX, offsetY], offset of the globe in pixel |  |
 | markers | An array of markers displayed | |
+| range | Range radius in kilometers for selected marker |  |
+| rangeColor | [r, g, b] of the range circle color, 0 ≤ r, g, b ≤ 1 |  |
+| rangeOpacity | Opacity of the range circle, 0 ≤ rangeOpacity ≤ 1, defaults to 1 |  |
+| selectedMarker | Index of selected marker (or null for none) |  |
+| onMarkerSelect | Callback when a marker is clicked: (index, marker) => void |  |
 | onRender | A callback function called when a new frame is rendered | Required |
 
 You can check how some of them actually look like in the [Playground](https://cobe-playground.vercel.app).

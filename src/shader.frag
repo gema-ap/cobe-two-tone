@@ -14,6 +14,11 @@ uniform vec3 markerColor;
 uniform vec4 markers[64 * 2]; // Now each marker takes 2 vec4 entries: [position+size, color]
 uniform float markersNum;
 uniform float dotSize;
+uniform vec3 rangeColor;
+uniform float rangeRadius;
+uniform float rangeOpacity;
+uniform vec3 selectedMarkerPos;
+uniform float hasSelection;
 
 uniform sampler2D uTexture;
 
@@ -158,6 +163,13 @@ void main() {
     // Flat coloring: land dots show landColor, everything else shows baseColor
     float isLandDot = landMask * v;
     layer += vec4(mix(baseColor, landColor, isLandDot), 1.);
+
+    // Draw range circle if a marker is selected
+    if (hasSelection > 0.5) {
+      float distToSelected = length(rP - selectedMarkerPos);
+      float inRange = step(distToSelected, rangeRadius);
+      layer.xyz = mix(layer.xyz, rangeColor, inRange * rangeOpacity);
+    }
 
     for (int m = 0; m < 128; m += 2) {
       if (m >= num) break;
