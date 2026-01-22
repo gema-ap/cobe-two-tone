@@ -15,14 +15,10 @@ export function Page() {
     phi: { value: 0, min: 0, max: Math.PI * 2 },
     theta: { value: 0, min: -Math.PI / 2, max: Math.PI / 2 },
     mapSamples: { value: 16000, min: 500, max: 100000 },
-    mapBrightness: { value: 6, min: 0, max: 12 },
-    mapBaseBrightness: { value: 0, min: 0, max: 1 },
-    diffuse: { value: 1.2, min: 0, max: 5 },
-    dark: { value: 1, min: 0, max: 1 },
     baseColor: { r: 60, g: 60, b: 60 },
+    landColor: { r: 255, g: 255, b: 255 },
     markerColor: { r: 255, g: 255, b: 255 },
     markerSize: { value: 0.05, min: 0, max: 0.1 },
-    glowColor: { r: 255, g: 255, b: 255 },
     scale: { value: 1, min: 0, max: 4 },
     offsetX: { value: 0, min: -1, max: 1 },
     offsetY: { value: 0, min: -1, max: 1 },
@@ -46,12 +42,10 @@ export function Page() {
       height: size * 2,
       phi: 0,
       theta: 0,
-      diffuse: 1.2,
       mapSamples: paramsRef.current.mapSamples,
-      mapBrightness: paramsRef.current.mapBrightness,
       baseColor: [0.3, 0.3, 0.3],
+      landColor: [1, 1, 1],
       markerColor: [1, 0.5, 1],
-      glowColor: [1, 1, 1],
       markers: [
         // San Francisco - default color
         { location: [37.7595, -122.4367] },
@@ -73,28 +67,24 @@ export function Page() {
         { location: [-9.746956, -44.261249], color: [1, 0.4, 0.7] },
       ].map((marker) => ({ ...marker, size: paramsRef.current.markerSize })),
       onRender: (state) => {
-        state.dark = paramsRef.current.dark
         state.phi = paramsRef.current.phi + r
         if (!pause.current) r += 0.003
         state.theta = paramsRef.current.theta
         state.mapSamples = paramsRef.current.mapSamples
-        state.mapBrightness = paramsRef.current.mapBrightness
-        state.mapBaseBrightness = paramsRef.current.mapBaseBrightness
-        state.diffuse = paramsRef.current.diffuse
         state.baseColor = [
           paramsRef.current.baseColor.r / 255,
           paramsRef.current.baseColor.g / 255,
           paramsRef.current.baseColor.b / 255,
         ]
+        state.landColor = [
+          paramsRef.current.landColor.r / 255,
+          paramsRef.current.landColor.g / 255,
+          paramsRef.current.landColor.b / 255,
+        ]
         state.markerColor = [
           paramsRef.current.markerColor.r / 255,
           paramsRef.current.markerColor.g / 255,
           paramsRef.current.markerColor.b / 255,
-        ]
-        state.glowColor = [
-          paramsRef.current.glowColor.r / 255,
-          paramsRef.current.glowColor.g / 255,
-          paramsRef.current.glowColor.b / 255,
         ]
         state.scale = paramsRef.current.scale
         state.offset = [

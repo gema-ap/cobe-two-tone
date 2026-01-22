@@ -3,33 +3,25 @@ import Phenomenon from "phenomenon";
 const OPT_PHI = "phi";
 const OPT_THETA = "theta";
 const OPT_DOTS = "mapSamples";
-const OPT_MAP_BRIGHTNESS = "mapBrightness";
 const OPT_BASE_COLOR = "baseColor";
+const OPT_LAND_COLOR = "landColor";
 const OPT_MARKER_COLOR = "markerColor";
-const OPT_GLOW_COLOR = "glowColor";
 const OPT_MARKERS = "markers";
-const OPT_DIFFUSE = "diffuse";
 const OPT_DPR = "devicePixelRatio";
-const OPT_DARK = "dark";
 const OPT_OFFSET = "offset";
 const OPT_SCALE = "scale";
 const OPT_OPACITY = "opacity";
-const OPT_MAP_BASE_BRIGHTNESS = "mapBaseBrightness";
 
 const OPT_MAPPING = {
     [OPT_PHI]: GLSLX_NAME_PHI,
     [OPT_THETA]: GLSLX_NAME_THETA,
     [OPT_DOTS]: GLSLX_NAME_DOTS,
-    [OPT_MAP_BRIGHTNESS]: GLSLX_NAME_DOTS_BRIGHTNESS,
     [OPT_BASE_COLOR]: GLSLX_NAME_BASE_COLOR,
+    [OPT_LAND_COLOR]: GLSLX_NAME_LAND_COLOR,
     [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
-    [OPT_GLOW_COLOR]: GLSLX_NAME_GLOW_COLOR,
-    [OPT_DIFFUSE]: GLSLX_NAME_DIFFUSE,
-    [OPT_DARK]: GLSLX_NAME_DARK,
     [OPT_OFFSET]: GLSLX_NAME_OFFSET,
     [OPT_SCALE]: GLSLX_NAME_SCALE,
     [OPT_OPACITY]: GLSLX_NAME_OPACITY,
-    [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
 };
 
 const { PI, sin, cos, sqrt, atan2, floor, max, pow, log2 } = Math;
@@ -168,19 +160,9 @@ export default (canvas, opts) => {
             [GLSLX_NAME_PHI]: createUniform("float", OPT_PHI),
             [GLSLX_NAME_THETA]: createUniform("float", OPT_THETA),
             [GLSLX_NAME_DOTS]: createUniform("float", OPT_DOTS),
-            [GLSLX_NAME_DOTS_BRIGHTNESS]: createUniform(
-                "float",
-                OPT_MAP_BRIGHTNESS,
-            ),
-            [GLSLX_NAME_MAP_BASE_BRIGHTNESS]: createUniform(
-                "float",
-                OPT_MAP_BASE_BRIGHTNESS,
-            ),
             [GLSLX_NAME_BASE_COLOR]: createUniform("vec3", OPT_BASE_COLOR),
+            [GLSLX_NAME_LAND_COLOR]: createUniform("vec3", OPT_LAND_COLOR),
             [GLSLX_NAME_MARKER_COLOR]: createUniform("vec3", OPT_MARKER_COLOR),
-            [GLSLX_NAME_DIFFUSE]: createUniform("float", OPT_DIFFUSE),
-            [GLSLX_NAME_GLOW_COLOR]: createUniform("vec3", OPT_GLOW_COLOR),
-            [GLSLX_NAME_DARK]: createUniform("float", OPT_DARK),
             [GLSLX_NAME_MARKERS]: {
                 type: "vec4",
                 value: mapMarkers(opts[OPT_MARKERS], opts[OPT_DOTS]),

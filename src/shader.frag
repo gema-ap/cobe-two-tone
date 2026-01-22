@@ -9,15 +9,11 @@ uniform float theta;
 uniform float dots;
 uniform float scale;
 uniform vec3 baseColor;
+uniform vec3 landColor;
 uniform vec3 markerColor;
-uniform vec3 glowColor;
 uniform vec4 markers[64 * 2]; // Now each marker takes 2 vec4 entries: [position+size, color]
 uniform float markersNum;
-uniform float dotsBrightness;
-uniform float diffuse;
-uniform float dark;
-uniform float opacity; 
-uniform float mapBaseBrightness;
+uniform float opacity;
 
 uniform sampler2D uTexture;
 
@@ -141,16 +137,13 @@ void main() {
 
   float l = dot(uv, uv);
   vec4 color = vec4(0);
-  float glowFactor = 0.;
   int num = int(markersNum);
 
   if (l <= rSquared) {
     float dis;
     vec4 layer = vec4(0);
-    vec3 light = vec3(0,0,1);
     vec3 p = normalize(vec3(uv, sqrt(rSquared - l)));
     mat3 rot = rotate(theta, phi);
-    float dotNL = dot(p, light);
 
     vec3 rP = p * rot;
     vec3 gP = nearestFibonacciLattice(rP, dis);
@@ -159,15 +152,13 @@ void main() {
     float gTheta = acos(-gP.x / cos(gPhi));
     if (gP.z < 0.) gTheta = -gTheta;
 
-    float mapColor = max(texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x, mapBaseBrightness);
+    float landMask = texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x;
     float v = smoothstep(.008, .0, dis);
 
-    float lighting = pow(dotNL,diffuse)*dotsBrightness;
-    float sample = mapColor*v * lighting;
-    float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
-    layer += vec4(baseColor * colorFactor, 1.);
+    // Flat coloring: land dots show landColor, everything else shows baseColor
+    float isLandDot = landMask * v;
+    layer += vec4(mix(baseColor, landColor, isLandDot), 1.);
 
-    float markerLight = 0.;
     for (int m = 0; m < 128; m += 2) {
       if (m >= num) break;
       vec4 marker = markers[m]; // Position and size
@@ -178,28 +169,19 @@ void main() {
       dis = length(l);
 
       // c is already the nearest Fibonacci lattice point, so use it directly
-      if (dis < size) { 
+      if (dis < size) {
         float halfSize = size * .5;
         float hr = smoothstep(halfSize, 0., dis);
-        markerLight += hr;
-        // If marker has a custom color (w component is 1), use it
+        // Flat marker coloring
         if (markerColorData.w > 0.5) {
-          layer.xyz = mix(layer.xyz, markerColorData.xyz, hr * lighting);
+          layer.xyz = mix(layer.xyz, markerColorData.xyz, hr);
         } else {
-          // Otherwise use the global marker color
-          layer.xyz = mix(layer.xyz, markerColor, hr * lighting);
+          layer.xyz = mix(layer.xyz, markerColor, hr);
         }
       }
     }
-    layer.xyz += pow(1. - dotNL, 4.) * glowColor;
-
     color += layer * (1. + opacity) * .5;
-
-    glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), vec3(0,0,1)), 4.) * smoothstep(0.,1.,.2/(l-rSquared));
-  } else {
-    float outD = sqrt(.2/(l - rSquared));
-    glowFactor = smoothstep(0.5,1., outD / (outD + 1.));
   }
 
-  gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
+  gl_FragColor = color;
 }
